@@ -1,7 +1,10 @@
 package com.example.demo.controller;
-import static com.example.demo.bean.JPADynamicQueryBuilder.*;
 
-import com.example.demo.bean.JPADynamicQueryBuilder;
+import com.example.demo.core.JPAQueryBuilder.*;
+
+import com.example.demo.core.JPAQueryBuilder;
+import com.example.demo.core.JPAQueryExecutor;
+import com.example.demo.model.ChildTable;
 import com.example.demo.model.TestTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,26 +12,36 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 @RestController
 public class TestController {
     @Autowired
-    private EntityManager entityManager;
+    private JPAQueryExecutor queryExecutor;
 
     @GetMapping("/test")
     public ResponseEntity test() {
-        Condition condition1 = condition("tb.id", ">=", 10).and().condition("tb.id", "<=", 20);
-        Condition condition2 = condition("tb.id", ">", 2).or().condition("tb.id", "=", 17);
+        JPAQueryBuilder<ChildTable> queryBuilder = new JPAQueryBuilder<>();
 
-        String query = new JPADynamicQueryBuilder()
-                .select()
-                .from(TestTable.class, "tb")
+        ValueCondition valueCondition1 = queryBuilder
+                .newValueCondition("tb.age", ">=", 10)
+                .and()
+                .condition("tb.age", "<=", 30);
+
+        queryBuilder.select(ChildTable.class, "cb")
+                .from(ChildTable.class, "cb")
+                .joinOn(JoinType.INNER_JOIN, TestTable.class, "tb",
+                        queryBuilder.newFieldCondition("cb.testTableID", "=", "tb.id")
+                                .and().condition(queryBuilder.newValueCondition("cb.value", "=", "a")
+                                .or().condition("cb.value", "=", "b")))
                 .where(
-                        condition1.or().condition(condition2)
-                ).build();
-        List<TestTable> result = entityManager.createQuery(query, TestTable.class).getResultList();
+                        valueCondition1
+                )
+                .orderBy("cb.value", Direction.ASC)
+                .withPagination(20);
+        List<ChildTable> result = queryExecutor
+                .executeQuery(queryBuilder)
+                .getResultList();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

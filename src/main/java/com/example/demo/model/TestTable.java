@@ -1,6 +1,9 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "test_table")
@@ -13,6 +16,9 @@ public class TestTable {
     private String name;
     @Column(name = "age")
     private int age;
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "testTable")
+//    @JsonIgnore
+//    private List<ChildTable> childTables;
 
     public int getId() {
         return id;
@@ -37,4 +43,12 @@ public class TestTable {
     public void setAge(int age) {
         this.age = age;
     }
+
+//    public List<ChildTable> getChildTables() {
+//        return childTables;
+//    }
+//
+//    public void setChildTables(List<ChildTable> childTables) {
+//        this.childTables = childTables;
+//    }
 }
