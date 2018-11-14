@@ -1,5 +1,8 @@
 package com.example.demo.core;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -244,6 +247,42 @@ public class JPAQueryBuilder<T> {
     }
 
     /**
+     * <p>JPA query for tuple values (...)
+     * <p><i>Example:</i>
+     * <p><b>.tuple("f.id", "f.code", "f.total")</b>(10)
+     * <p><i>Query Result:</i>
+     * <p>... <b>(f.id,f.tuple,f.total)</b> ...
+     *
+     * @return this {@code JPAQueryBuilder<T>}
+     */
+    public static String tuple(Object... values) {
+        StringBuilder result = new StringBuilder("(");
+        if (values.length >= 1) {
+            result.append(values[0]);
+            for (int i = 1; i < values.length; i++) {
+                if (values[i] instanceof String) {
+                    result.append(",'").append(values[i]).append("'");
+                } else {
+                    result.append(",").append(values[i]);
+                }
+            }
+        }
+        return result.append(")").toString();
+    }
+
+    public static String tuple(Iterable<?> objects, String[] fields) throws NoSuchFieldException {
+        Type type = objects.getClass().getGenericSuperclass();
+        for(Object object : objects) {
+            Class<?> objectClass = object.getClass();
+            for (String field : fields) {
+                Field objectField = objectClass.getDeclaredField(field);
+
+            }
+        }
+        return "";
+    }
+
+    /**
      * <p>Create full query string
      *
      * @return this {@code JPAQueryBuilder<T>}
@@ -315,7 +354,7 @@ public class JPAQueryBuilder<T> {
         AtomicInteger indexer;
         Map<Integer, Object> params;
 
-        public ValueCondition(AtomicInteger indexer, Map<Integer, Object> params) {
+        private ValueCondition(AtomicInteger indexer, Map<Integer, Object> params) {
             this.indexer = indexer;
             this.params = params;
         }
@@ -358,6 +397,8 @@ public class JPAQueryBuilder<T> {
         boolean hasConjunction = false;
         String conjunction;
         StringBuilder condition = new StringBuilder();
+
+        private FieldCondition() {}
 
         public FieldCondition condition(String field, String operation, Object value) {
             appendConjunction();

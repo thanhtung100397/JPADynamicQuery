@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class TestController {
@@ -42,6 +44,14 @@ public class TestController {
         List<ChildTable> result = queryExecutor
                 .executeQuery(queryBuilder)
                 .getResultList();
+
+        Set<TestTable> testTableSet = new HashSet<>();
+        TestTable testTable = new TestTable();
+        testTable.setId(1);
+        testTable.setName("tung");
+        testTable.setAge(22);
+        testTableSet.add(testTable);
+        queryBuilder.tuple(testTableSet, new String[]{"id", "name"});
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

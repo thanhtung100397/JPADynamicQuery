@@ -38,4 +38,6 @@ public class JPAQueryExecutor {
         Long count = typedQuery.getSingleResult();
         return count == null? 0 : count;
     }
+
+
 }
