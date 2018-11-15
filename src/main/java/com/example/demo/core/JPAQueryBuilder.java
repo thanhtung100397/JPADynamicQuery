@@ -2,7 +2,6 @@ package com.example.demo.core;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,7 +23,7 @@ public class JPAQueryBuilder<T> {
     /**
      * <p>JPA query SELECT ...
      * <p><i>Example:</i>
-     * <p><b>.select()</b>
+     * <p><b>.select</b>(Foo.class, "f")
      * <p><i>Query Result:</i>
      * <p><b>SELECT f</b> ...
      *
@@ -32,6 +31,31 @@ public class JPAQueryBuilder<T> {
      */
     public JPAQueryBuilder<T> select(Class<T> resultClass, String name) {
         this.select = name;
+        this.resultClass = resultClass;
+        return this;
+    }
+
+    /**
+     * <p>JPA query SELECT new ...
+     * <p><i>Example:</i>
+     * <p><b>.selectAsObject</b>(Bar.class, "f.id, f.code")
+     * <p><i>Query Result:</i>
+     * <p><b>SELECT new com.demo.bar.Bar(f.id, f.code)</b> ...
+     *
+     * @return this {@code JPAQueryBuilder<T>}
+     */
+    public JPAQueryBuilder<T> selectAsObject(Class<T> resultClass, String... params) {
+        StringBuilder select = new StringBuilder("new ")
+                .append(resultClass.getName())
+                .append("(");
+        if (params.length >= 1) {
+            select.append(params[0]);
+        }
+        for (int i = 1; i < params.length; i++) {
+            select.append(", ").append(params[i]);
+        }
+        select.append(")");
+        this.select = select.toString();
         this.resultClass = resultClass;
         return this;
     }
@@ -272,7 +296,7 @@ public class JPAQueryBuilder<T> {
 
     public static String tuple(Iterable<?> objects, String[] fields) throws NoSuchFieldException {
         Type type = objects.getClass().getGenericSuperclass();
-        for(Object object : objects) {
+        for (Object object : objects) {
             Class<?> objectClass = object.getClass();
             for (String field : fields) {
                 Field objectField = objectClass.getDeclaredField(field);
@@ -398,7 +422,8 @@ public class JPAQueryBuilder<T> {
         String conjunction;
         StringBuilder condition = new StringBuilder();
 
-        private FieldCondition() {}
+        private FieldCondition() {
+        }
 
         public FieldCondition condition(String field, String operation, Object value) {
             appendConjunction();
