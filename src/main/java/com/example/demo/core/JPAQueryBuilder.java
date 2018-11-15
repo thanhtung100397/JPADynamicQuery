@@ -392,12 +392,12 @@ public class JPAQueryBuilder<T> {
         return pageSize;
     }
 
-    public ValueCondition newValueCondition(String field, String operation, Object value) {
-        return new ValueCondition(this.indexer, this.params).condition(field, operation, value);
+    public ValueCondition newValueCondition() {
+        return new ValueCondition(this.indexer, this.params);
     }
 
-    public FieldCondition newFieldCondition(String field, String operation, Object value) {
-        return new FieldCondition().condition(field, operation, value);
+    public FieldCondition newFieldCondition() {
+        return new FieldCondition();
     }
 
     public static class ValueCondition extends FieldCondition {
@@ -454,8 +454,10 @@ public class JPAQueryBuilder<T> {
         public FieldCondition condition(String field, String operation, Object value) {
             appendConjunction();
             this.condition.append(field).append(" ")
-                    .append(operation).append(" ")
-                    .append(value);
+                    .append(operation).append(" ");
+            if (value != null) {
+                this.condition.append(value);
+            }
             return this;
         }
 

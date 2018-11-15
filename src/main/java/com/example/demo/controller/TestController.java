@@ -26,15 +26,17 @@ public class TestController {
         JPAQueryBuilder<ChildTable> queryBuilder = new JPAQueryBuilder<>();
 
         ValueCondition valueCondition1 = queryBuilder
-                .newValueCondition("tb.age", ">=", 10)
+                .newValueCondition()
+                .condition("tb.age", ">=", 10)
                 .and()
                 .condition("tb.age", "<=", 30);
 
         queryBuilder.select(ChildTable.class, "cb")
                 .from(ChildTable.class, "cb")
                 .joinOn(JoinType.INNER_JOIN, TestTable.class, "tb",
-                        queryBuilder.newFieldCondition("cb.testTableID", "=", "tb.id")
-                                .and().condition(queryBuilder.newValueCondition("cb.value", "=", "a")
+                        queryBuilder.newValueCondition()
+                                .condition("cb.testTableID", "=", "tb.id")
+                                .and().condition(queryBuilder.newValueCondition().condition("cb.value", "=", "a")
                                 .or().condition("cb.value", "=", "b")))
                 .where(
                         valueCondition1
@@ -46,12 +48,6 @@ public class TestController {
                 .getResultList();
 
         Set<TestTable> testTableSet = new HashSet<>();
-        TestTable testTable = new TestTable();
-        testTable.setId(1);
-        testTable.setName("tung");
-        testTable.setAge(22);
-        testTableSet.add(testTable);
-        queryBuilder.tuple(testTableSet, new String[]{"id", "name"});
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
