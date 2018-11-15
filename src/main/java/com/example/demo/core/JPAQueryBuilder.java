@@ -247,7 +247,7 @@ public class JPAQueryBuilder<T> {
     /**
      * <p>JPA query COUNT (...)
      * <p><i>Example:</i>
-     * <p><b>.count("f.id")</b>(10)
+     * <p><b>.count("f.id")</b>
      * <p><i>Query Result:</i>
      * <p>... <b>COUNT(f.id)</b> ...
      *
@@ -260,7 +260,7 @@ public class JPAQueryBuilder<T> {
     /**
      * <p>JPA query DISTINCT (...)
      * <p><i>Example:</i>
-     * <p><b>.distinct("f.id")</b>(10)
+     * <p><b>.distinct("f.id")</b>
      * <p><i>Query Result:</i>
      * <p>... <b>DISTINCT(f.id)</b> ...
      *
@@ -268,6 +268,32 @@ public class JPAQueryBuilder<T> {
      */
     public static String distinct(String value) {
         return "DISTINCT (" + value + ")";
+    }
+
+    /**
+     * <p>JPA query MONTH (...)
+     * <p><i>Example:</i>
+     * <p><b>.month("f.createdDate")</b>
+     * <p><i>Query Result:</i>
+     * <p>... <b>MONTH(f.createdDate)</b> ...
+     *
+     * @return this {@code JPAQueryBuilder<T>}
+     */
+    public static String month(String value) {
+        return "MONTH (" + value + ")";
+    }
+
+    /**
+     * <p>JPA query YEAR (...)
+     * <p><i>Example:</i>
+     * <p><b>.year("f.createdDate")</b>
+     * <p><i>Query Result:</i>
+     * <p>... <b>YEAR(f.createdDate)</b> ...
+     *
+     * @return this {@code JPAQueryBuilder<T>}
+     */
+    public static String year(String value) {
+        return "YEAR (" + value + ")";
     }
 
     /**
